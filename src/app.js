@@ -1,51 +1,67 @@
 const express = require('express');
+const bcrypt = require('bcrypt')
 const app = express();
 const connectDB = require("./config/database");
 const User = require("./models/user");
 
-// app.post("/signup", async (req,res)=>{
-//     const user = new User ({
-//         firstName:"Abhinav",
-//         lastName: "Singh",
-//         emailId: "abhinav@.com",
-//         password: "abhi9",
-//         age: 35
-//     });
-//     await user.save();
-//     res.send("user added sucessfully");
-// });
+const {validateSignUpData} = require("./utils/validation");
+
+
 
 app.use(express.json());
 
+// Creating Signup Api
 app.post("/signup", async (req,res)=>{
-    const userData = req.body;
-    const user= new User(userData);
+
+   
+    const {firstName, lastName, emailId, password}= req.body;
+
+     // Encrypt the password 
+     const passwordHash = await bcrypt.hash(password,10);
+
+     // Create instance of the User model
+    const user= new User({
+        firstName,
+        lastName,
+        emailId,
+        password: passwordHash
+    });
     try{
-        await user.save();
-        res.send("User Added Sucessfully");
+
+    // Validate the data
+    validateSignUpData(req);
+
+
+    await user.save();
+    res.send("User Added Sucessfully");
       }
+      
     catch(err){
-        res.status(400).send("Some went Wrong");
+        res.status(400).send("ERROR:"+err.message);
     }
 })
 
-// For getting user by emailID 
-// app.get("/feed",async (req,res)=>{
-//      const emailId = req.body.emailId;
+// Creating Login API
+app.post("/login",async (req,res)=>{
+    try{
+        const {password, emailId}=req.body;
 
-//      try{
-//         const feedUser= await User.find({
-//             emailId:emailId
-//          });
-//          console.log("user add hogya hai");
-//          res.send(feedUser);
-//      }
-//      catch(err){
-//         res.status(404).send("User Not Found");
-//      }
+        const user= await User.findOne({emailId:emailId});
+        if(!user){
+            throw new Error("Invalid credentials");
+        }
+        const isValidPassword= await bcrypt.compare(password,user.password);
+        if (!isValidPassword){
+            throw new Error("Invalid credentials");
+        }
+        res.send("Login Successful")
+    }
+    catch(err){
+        res.status(400).send("ERROR:"+err.message);
+    }
     
-     
-// })
+})
+
 
 
 // Getting all the users to create a feed
