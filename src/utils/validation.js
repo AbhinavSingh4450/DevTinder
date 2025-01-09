@@ -15,6 +15,20 @@ const validateSignUpData = (req) => {
  }
 
 }
+
+const validateEditProfileData =(req)=>{
+   const labelThatCanUpdate=["firstName","lastName","age","gender","photoUrl","about","skills"];
+    const userInputForUpdate = req.body;
+    const user = req.user;
+
+    const isUpdatePossible= Object.keys(userInputForUpdate).every((k)=>labelThatCanUpdate.includes(k));
+    if(!isUpdatePossible){
+        throw new Error("Update Not Possible");
+    }
+
+    return isUpdatePossible;
+}
 module.exports={
    validateSignUpData,
+   validateEditProfileData
 }
