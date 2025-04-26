@@ -39,7 +39,8 @@ const userSchema = new mongoose.Schema({
     },
     age:{
         type: Number,
-        min:18
+        min:18,
+
     },
     photoUrl:{
         type:String,
@@ -59,7 +60,8 @@ const userSchema = new mongoose.Schema({
             if(!["male", "female", "others"].includes(value)){
                 throw new Error("Not a valid Gender");
             }
-        }
+        },
+        
     }
 
 }, {timestamps:true});

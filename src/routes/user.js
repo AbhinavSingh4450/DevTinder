@@ -13,7 +13,7 @@ userRouter.get("/user/requests/received", userAuth, async(req,res)=>{
     const connectionRequest= await ConnectionRequest.find({
         toUserId: loggedInUser._id,
         status:"interested"
-    }).populate("toUserId", ITEMS_TO_POPULATE);
+    }).populate("fromUserId", ITEMS_TO_POPULATE).populate("toUserId",ITEMS_TO_POPULATE);
 
     res.json({
         message:"These are the requests received",

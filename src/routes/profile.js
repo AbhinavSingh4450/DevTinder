@@ -14,20 +14,22 @@ profileRouter.get("/profile/view", userAuth, async(req,res)=>{
     }
 })
 
-profileRouter.patch("/profile/edit", userAuth, async(req,res)=>{
+profileRouter.put("/profile/edit", userAuth, async(req,res)=>{
     try{
     validateEditProfileData(req);
     const loggedInUser=req.user;
+    console.log(loggedInUser);
     const userInputForUpdate = req.body;
     
-    Object.keys(userInputForUpdate).every((key)=>{
+    
+    Object.keys(userInputForUpdate).forEach((key)=>{
         loggedInUser[key]=userInputForUpdate[key];
     } )
-
+    
 
     await loggedInUser.save();
     res.json({
-        message:`${loggedInUser.firstName}, your profile edit successfully!`,
+        message:`${loggedInUser.firstName}, your profile edited successfully!`,
         data: loggedInUser
     });
   }
